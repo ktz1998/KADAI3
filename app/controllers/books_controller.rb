@@ -1,9 +1,10 @@
 class BooksController < ApplicationController
   before_action :ensure_current_user, {only: [:edit, :update]}
   def ensure_current_user
-  if current_user.id != params[:id].to_i
-    redirect_to books_path
-  end
+    @book = Book.find(params[:id])
+    if @book.user != current_user
+       redirect_to books_path
+    end
   end
 
   def new
@@ -18,7 +19,7 @@ class BooksController < ApplicationController
       redirect_to book_path(@book)
     else
       @user = current_user
-      @books = @user.books
+      @books = Book.all
       render :index
     end
   end
@@ -32,15 +33,16 @@ class BooksController < ApplicationController
   def show
     @book = Book.find(params[:id])
     @user = @book.user
+    @new_book = Book.new
   end
 
   def edit
     @book = Book.find(params[:id])
-    if @book.user == current_user
-      render "edit"
-    else
-      redirect_to books_path
-    end
+    # if @book.user == current_user
+    #   render "edit"
+    # else
+    #   redirect_to books_path
+    # end
   end
 
    def update
